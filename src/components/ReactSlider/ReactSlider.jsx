@@ -132,6 +132,12 @@ class ReactSlider extends React.Component {
         minDistance: PropTypes.number,
 
         /**
+         * The maximum distance between any pair of thumbs.
+         * Must be positive, but zero means they must sit on top of each other.
+         */
+        maxDistance: PropTypes.number,
+
+        /**
          * Determines the initial positions of the thumbs and the number of thumbs.
          *
          * If a number is passed a slider with one thumb will be rendered.
@@ -324,6 +330,7 @@ class ReactSlider extends React.Component {
         step: 1,
         pageFn: step => step * 10,
         minDistance: 0,
+        maxDistance: 100,
         defaultValue: 0,
         orientation: 'horizontal',
         className: 'slider',
@@ -768,6 +775,13 @@ class ReactSlider extends React.Component {
             }
         }
 
+        // Prevents the slider from growing above `props.maxDistance`
+        for (let i = 0; i < value.length - 1; i += 1) {
+            if (value[i + 1] - value[i] > this.props.maxDistance) {
+                return;
+            }
+        }
+
         this.fireChangeEvent('onBeforeChange');
         this.hasMoved = true;
         this.setState({ value }, () => {
@@ -972,9 +986,8 @@ class ReactSlider extends React.Component {
     }
 
     renderThumb = (style, i) => {
-        const className = `${this.props.thumbClassName} ${this.props.thumbClassName}-${i} ${
-            this.state.index === i ? this.props.thumbActiveClassName : ''
-        }`;
+        const className = `${this.props.thumbClassName} ${this.props.thumbClassName}-${i} ${this.state.index === i ? this.props.thumbActiveClassName : ''
+            }`;
 
         const props = {
             'ref': r => {
